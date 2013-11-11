@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="org.lanit.cp.mobile" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>Мобильный МФЦ</name>
+    <name>Мобильный МФЦ!</name>
     <description>
-        Мобильный клиент МФЦ.
+        Мобильный клиент МФЦ!.
     </description>
     <author email="smatveev@lanit.ru" href="http://www.lanit.ru">
         Ланит-Самара
@@ -18,7 +18,7 @@
     <preference name="ios-statusbarstyle" value="black-opaque" />
     <preference name="detect-data-types" value="true" />
     <preference name="exit-on-suspend" value="false" />
-    <preference name="show-splash-screen-spinner" value="true" />
+    <preference name="show-splash-screen-spinner" value="false" />
     <preference name="auto-hide-splash-screen" value="true" />
     <preference name="disable-cursor" value="false" />
     <preference name="android-minSdkVersion" value="7" />
