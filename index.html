@@ -101,7 +101,7 @@
         <script type="text/javascript">
 
 	    var ddd;
-	    var storeName='propsAppMFC3';
+	    var storeName='propsAppMFC31';
 	    var propsAppEt = {'phone':'89276035562','email':'smatveev@lanit.ru','password':'57563','urlrepo':'http://192.168.58.135','auto_selectMFC':'','director':false,'lastApp':'user'};
 	    var propsApp;
 	    var userError;
@@ -525,7 +525,7 @@
 	      res["answers"]=okgu_answer;
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/sendResultOKGU",
-	      type : "POST",
+	      type : "GET",
 	      data : {phone:propsApp['phone'], pwd:propsApp['password'], packNum:packNum, authCode:authCode, 
 		answers: JSON.stringify(res),inquirerId:okgu.result.inquirerId},
 	      contentType : "application/json",
