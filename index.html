@@ -761,7 +761,11 @@ var bbb;
 	    
 	    //serviceListInfo
 	    
-	    function serviceListInfo_go(){
+	    var categoryService;
+	    var ownerService;
+	    
+	    function serviceListInfo_go(owner){
+	      ownerService=owner;
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/listCategory",
 	      type : "GET",
@@ -776,9 +780,9 @@ var bbb;
 		    $.each( response.result, function ( i, val ) {
 			    html += "<li><a code='"+val.value+"' onclick='serviceListInfo_selectCat(this)'>" + val.name + "</a></li>";
 		    });
-			//
-			$.mobile.changePage('#serviceListInfo');
-			//	
+		    //
+		    $.mobile.changePage('#serviceListInfo');
+		    //	
 		    $ul.html( html );
 		    $ul.listview( "refresh" );
 		  }  
@@ -797,7 +801,7 @@ var bbb;
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/listServices",
 	      type : "GET",
-	      data : {search:val,category:categoryService},
+	      data : {search:val,category:categoryService,owner:ownerService},
 	      contentType : "application/json",
 	      dataType: "jsonp",
 	      success :
@@ -926,6 +930,7 @@ var bbb;
 			      "<div class=ui-block-a><span class='m-value2'>"+(val.msg!=null?val.msg:"")+"</span></div>"+
 			      "<div class=ui-block-a>Комментарий сотрудника</div>"+
 			      "<div class=ui-block-a><span class='m-value2'>"+(val.msg2!=null?val.msg2:"[не задан]")+"</span></div>"+
+			      "<div class=ui-block-a>Статус: <span style='color:red'>"+val.rstatusName+"</style></div>"+
 			    "</div>"+
 			    "<a requestId='"+val.id+"' onclick='dialog_callBack_cancel(this)' data-rel='popup' data-position-to='window' data-transition='pop'>Отменить</a>"+
 			  "</li>"+
@@ -1376,6 +1381,8 @@ var bbb;
 		$('#director_select_owner_head').html("Состояние ЭО");
 	      else if (pageMode=='contacts')
 		$('#director_select_owner_head').html("Контакты МФЦ");
+	      else if (pageMode=='serviceListInfo')
+		$('#director_select_owner_head').html("Информация");
 	      $('#director_select_owner_input').val("");
 	      director_searchOwner(null);
 	    }
@@ -1418,6 +1425,8 @@ var bbb;
 		status_eq(el.attr('code'));
 	      else if (pageMode=='contacts')
 		contacts_mfc(el.attr('code'));
+	      else if (pageMode=='serviceListInfo')
+		serviceListInfo_go(el.attr('code'));
 	    }
 	    
 	    //ЭО
@@ -1585,7 +1594,7 @@ var bbb;
 	    <div data-role="content" data-theme="b">
 	      <div id="divUser">
 		<ul data-role="listview" data-inset="true" data-divider-theme="d">
-		    <li><a onclick="serviceListInfo_go()">Информация об услугах</a></li>
+		    <li><a onclick="page_go('serviceListInfo')">Информация об услугах</a></li>
 		    <li><a onclick="page_go('contacts')">Контакты МФЦ</a></li>
 		    <li id="item_callBack"><a onclick="callBack_go()">Обратный звонок</a></li>
 		    <li id="item_records"><a onclick="records_go(0)">Запись на прием</a></li>
@@ -1739,7 +1748,7 @@ var bbb;
 	</div>	
 	<!-- Director end-->
 	
-	<div data-role="page" id="serviceListInfo" data-add-back-btn="false" data-back-btn-text="Назад">
+	<div data-role="page" id="serviceListInfo" data-add-back-btn="true" data-back-btn-text="Назад">
 	    <div data-role="header" data-theme="b" data-position="fixed">
 		    <a href="#main_page" data-role="button" data-icon="bars" data-inline="true" class="ui-btn-right">Меню</a>
 		    <h1>Информация</h1>
@@ -2022,9 +2031,13 @@ var bbb;
 			  <div data-role="controlgroup" data-type="horizontal" data-mini="true">
 			      <input type="button" id="prevButton" onclick="serviceInfo_okgu_prev()" value="Назад">
 			      <input type="button" id="skipButton" onclick="serviceInfo_okgu_skip()" value="Пропустить">
-			      <input type="button" id="nextButton" onclick="serviceInfo_okgu_next()" value="Вперед">
+			      <input type="button" id="nextButton" onclick="serviceInfo_okgu_next()" value="Далее">
 			  </div>
-			  <input type="button" id="sendButton" onclick="serviceInfo_sendResultOKGU()" value="Отправить">
+			  <div id="divCommentOKGU" style="display:none">
+			    <label for="commentOKGU">Комментарий к анкете:</label>
+			    <textarea cols="20" rows="16" name="textarea" id="commentOKGU"></textarea>
+			    <input type="button" id="sendButton" onclick="serviceInfo_sendResultOKGU()" value="Отправить">
+			  </div>  
 			</div>  
 		      </div>
 		    </div>
@@ -2098,13 +2111,15 @@ var bbb;
 		  if (current>=okgu.result.questions.length){
 		    $('#nextButton').button("disable");
 		    $('#skipButton').button("disable");
-		    $('#sendButton').button("enable");
+		    $('#divCommentOKGU').css("display","block");
+		    //$('#sendButton').button("enable");
 		    return;
 		  }else{
 		    $('#nextButton').button("enable");
 		    $('#skipButton').button("enable");
-		    $('#sendButton').button("disable");
-		  }  
+		    $('#divCommentOKGU').css("display","none");
+		    //$('#sendButton').button("disable");
+		  }
 		  //
 		  okgu_current=current;
 		  var q=okgu.result.questions[okgu_current];
