@@ -521,13 +521,14 @@
 
 	    //okgu
 	    function serviceInfo_sendResultOKGU(){
+	      var com=$('#commentOKGU').val();
 	      var res={};
 	      res["answers"]=okgu_answer;
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/sendResultOKGU",
 	      type : "GET",
 	      data : {phone:propsApp['phone'], pwd:propsApp['password'], packNum:packNum, authCode:authCode, 
-		answers: JSON.stringify(res),inquirerId:okgu.result.inquirerId},
+		answers: JSON.stringify(res),inquirerId:okgu.result.inquirerId, comment:com},
 	      contentType : "application/json",
 	      dataType: "jsonp",
 	      success :
@@ -729,8 +730,10 @@
 			init();
 		    };
 	    });
-var bbb;
+
 	    function checkRegister(){
+	      saveSattings();
+	      //
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/checkRegister",
 	      type : "GET",
@@ -746,6 +749,8 @@ var bbb;
 	    };
 
 	    function register(){
+	      saveSattings();
+	      //
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/register",
 	      type : "GET",
