@@ -101,7 +101,7 @@
         <script type="text/javascript">
 
 	    var ddd;
-	    var storeName='propsAppMFC31';
+	    var storeName='propsAppMFC3133';
 	    var propsAppEt = {'phone':'89276035562','email':'smatveev@lanit.ru','password':'57563','urlrepo':'http://192.168.58.135','auto_selectMFC':'','director':false,'lastApp':'user'};
 	    var propsApp;
 	    var userError;
@@ -193,8 +193,8 @@
 		    'urlrepo':'http://109.233.228.11','auto_selectMFC':'Тюмень','auto_selectMFC_key':'http://109.233.228.11',
 		    'director':false,'lastApp':'user'};
 		else
-		  propsApp={'phone':'89276035562','email':'smatveev@lanit.ru','password':'57563',
-		    'urlrepo':'http://192.168.58.135','auto_selectMFC':'Самара','auto_selectMFC_key':'http://192.168.58.135',
+		  propsApp={'phone':'89276035562','email':'smatveev@lanit.ru','password':'67191',
+		    'urlrepo':'http://192.168.58.135','auto_selectMFC':'МЭР','auto_selectMFC_key':'http://192.168.58.135',
 		    'director':false,'lastApp':'user'};
 		
 /*		propsApp={'phone':'89276035562','email':'smatveev@lanit.ru','password':'57563',
@@ -290,8 +290,10 @@
 			      "<div class=ui-block-a>Дата обращения:</div>"+
 			      "<div class=ui-block-a><span class='m-value2'>"+formatDate(val.packDate)+"</span></div>"+
 			      "<div class=ui-block-a>Последняя активность в деле:</div>"+
-			      "<div class=ui-block-a><span class='m-value2'>"+formatDate(val.lastActivity)+"</span></div>"+
-			    "</div>"+
+			      "<div class=ui-block-a><span class='m-value2'>"+formatDate(val.lastActivity)+"</span></div>";
+		     if (val.docVidacha)
+		      html+="<div class=ui-block-a><span style='color:red'>Документы готовы к выдаче</span></div>";
+		     html+="</div>"+
 			  "</a></li>"+
 		      "</ul>";
 		    });
@@ -1283,7 +1285,7 @@
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/analyticMFC",
 	      type : "GET",
-	      data : {phone:propsApp['phone'], pwd:propsApp['password'],period:period, typeApp:typeApp},
+	      data : {phone:propsApp['phone'], pwd:propsApp['password'],period:period, typeApp:typeApp, owner:owner},
 	      contentType : "application/json",
 	      dataType: "jsonp",
 	      success :
