@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
@@ -13,6 +13,7 @@
 	<!-- календарь -->
 <!--	<link rel="stylesheet" type="text/css" href="css/datebox/jqm-datebox.min.css" /> -->
         <!-- jquery -->   
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 	<script src="js/jquery-1.9.1.min.js"></script>
 <!--	<script src="js/jquery.inputmask.js" type="text/javascript"></script>
 	<script src="js/jquery.maskedinput.js" type="text/javascript"></script> -->
@@ -259,8 +260,18 @@
 	    //serviceInfo
 	    
 	    function serviceInfo_go(){
-	      $.mobile.changePage('#serviceInfo');
 	      serviceInfo_changeList(true,'status1');
+	    }
+
+	    function serviceInfo_back(){
+	      $.mobile.changePage('#serviceInfo');
+	      if (modeServiceInfo){
+		$('#serviceInfo_check1').addClass('ui-btn-active');
+		$('#serviceInfo_check2').removeClass('ui-btn-active');
+	      }else{
+		$('#serviceInfo_check2').addClass('ui-btn-active');
+		$('#serviceInfo_check1').removeClass('ui-btn-active');
+	      }
 	    }
 	    
 	    function serviceInfo_changeList(mode,id){
@@ -275,6 +286,10 @@
 	      success :
 		function(response) {
 		  if (checkError(response)){
+		    $.mobile.changePage('#serviceInfo');
+		    $('#serviceInfo_check1').addClass('ui-btn-active');
+		    $('#serviceInfo_check2').removeClass('ui-btn-active');
+		    //
 		    var html="";
 		    $.each( response.result, function ( i, val ) {
 		      html+=
@@ -875,12 +890,7 @@
 	    
 	    //callBack
 	    function callBack_go(){
-	      if (emptyValue(propsApp['phone']))
-		$.mobile.changePage('#callBack_Disable');
-	      else{
-		callBack_list();
-		$.mobile.changePage('#callBack');
-	      }
+	      callBack_list();
 	    }
 	    
 	    function callBack_send(){
@@ -918,6 +928,8 @@
 	      success :
 		function(response) {
 		  if (checkError(response)){
+		    $.mobile.changePage('#callBack');
+		    //
 		    var html="";
 		    $.each( response.result, function ( i, val ) {
 		      html+=
@@ -1453,6 +1465,8 @@
 	      });
 	    }
 
+	    var locations;
+	    
 	    //Контакты МФЦ
 	    function contacts_mfc(owner){
 	      $.ajax({
@@ -1465,9 +1479,22 @@
 		function(response) {
 		  if (checkError(response)){
 		    var r=response.result;
+		    locations=r.locations;
+		    //
 		    var html="<table>"+
-		    "<tr><td><span class='m-label2'>Адрес:</span></td><td><span class='m-value'>"+(r.addresses!=null?r.addresses:"не задано")+"</span></td></tr>"+
-		    "<tr><td><span class='m-label2'>Контакты:</span></td><td><span class='m-value'>"+(r.contacts!=null?r.contacts:"не задано")+"</span></td></tr>"+
+		    "<tr><td><span class='m-label2'>Адрес:</span></td><td><span class='m-value'>"+(r.addresses!=null?r.addresses:"не задано")+"</span></td></tr>";
+		    if (r.locations!=null&&r.locations.length>0)
+		      html+="<tr><td></td><td><a href='' onclick='go_contacts_mfc_map()'>Показать на карте</a></td></tr>";
+		    html+="<tr><td><span class='m-label2'>Контакты:</span></td><td>";
+		    if (r.phones==null||r.phones.length==0)
+		      html+="<span class='m-value'>не задано</span></td>";
+		    else{
+		      for(i in r.phones){
+			var el=r.phones[i];
+			html+="<span class='m-value'>"+el+"</span><a href='tel:"+el+"'><img src='img/call_start.png'></a><br/>";
+		      }
+		    }
+		    html+="</td></tr>"+
 		    "<tr><td><span class='m-label2'>Режим работы:</span></td><td><span class='m-value'>"+(r.workMode!=null?r.workMode:"не задано")+"</span></td></tr>"+
 		    "</table>";
 		    $.mobile.changePage('#contacts_mfc_page');
@@ -1479,10 +1506,78 @@
 	      });
 	    }
 	    
-	    function test123(){
-	      //var d=new Date(year, month, day [, hour, minute, second, millisecond ]);
+	    function go_contacts_mfc_map(){
+	      $.mobile.changePage('#contacts_mfc_map_page');
+	      if (locations.length==0)
+		return;
+	      var el=locations[0];
+	      var point = new google.maps.LatLng(el[0], el[1]);
+	      //
+	      var myOptions = {
+		  zoom: 13,
+		  center: point,
+		  mapTypeId: google.maps.MapTypeId.ROADMAP
+	      };
+	      var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+	      for(i in locations){
+		var el=locations[i];
+		var point = new google.maps.LatLng(el[0], el[1]);
+		var marker = new google.maps.Marker({position: point,map: map});						
+		google.maps.event.addListener(marker, 'click', function() {
+		    alert(recordsArr["recordsOwnerName"]);
+		});
+	      }
 	    }
 
+/*	    
+var map = null;
+var markerArray = []; //create a global array to store markers
+
+function initialize() {
+    var myOptions = {
+        zoom: 5,
+        center: new google.maps.LatLng(34, 32),
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+        },
+        navigationControl: true,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+    google.maps.event.addListener(map, 'click', function() {
+        infowindow.close();
+    });
+    // Add markers to the map
+    // Set up markers based on the number of elements within the myPoints array
+    var marker = new google.maps.Marker({position: point,map: map});
+    for (var i = 0; i < locations.length; i++) {
+        createMarker(new google.maps.LatLng(locations[i][1], locations[i][2]),locations[i][0], locations[i][3], locations[i][4]);
+    }
+    mc.addMarkers(markerArray, true);
+}
+
+var infowindow = new google.maps.InfoWindow({
+    size: new google.maps.Size(150, 50)
+});
+
+function createMarker(latlng, myTitle, myNum, myIcon) {
+    var contentString = myTitle;
+    var marker = new google.maps.Marker({
+        position: latlng,
+        map: map,
+        icon: myIcon,
+        zIndex: Math.round(latlng.lat() * -100000) << 5,
+        title: myTitle
+    });
+    google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(contentString);
+        infowindow.open(map, marker);
+    });
+    markerArray.push(marker); //push local var marker into global array
+}
+*/	    
+	    
         </script>
         
 	<style type="text/css">
@@ -1552,29 +1647,18 @@
 		font-weight: bold;
 	    }
 
-	    .numberCircle2 {
-		-webkit-border-radius: 999px;
-		-moz-border-radius: 999px;
-		border-radius: 999px;
-		behavior: url(PIE.htc);
-
-		width: 36px;
-		height: 36px;
-		padding: 8px;
-
-		background: #fff;
-		border: 3px solid red;
-		color: #666;
-		text-align: center;
-
-		font: 26px Arial, sans-serif
-	    }
+	    #map_canvas{
+		width:100%;
+		height: 100%; 	
+		position:absolute;
+		top:0px;
+	    }	    
 	    
 	</style>
         
     </head>
     <body>
-	<div data-role="page" id="main_page" data-add-back-btn="true" data-back-btn-text="Назад">
+	<div data-role="page" id="main_page" data-add-back-btn="false" data-back-btn-text="Назад">
 	    <div data-role="popup" id="menu_App_Context" data-theme="d">
 		<ul data-role="listview" data-inset="true" data-divider-theme="d">
 		  <li><a onclick="checkMode(0);">Заявитель</a></li>
@@ -1593,7 +1677,7 @@
 	
 	    <div data-role="header" data-theme="b" data-position="fixed">
 		<a href="#menu_App_Context" id="main_check_app" style="display:none" data-rel="popup" data-role="button" data-inline="true" data-transition="none" data-icon="info" class="ui-btn-right">Тип</a>
-		<h1 id="twi_acc">МФЦ Заявитель</h1>
+		<h1 id="twi_acc">Заявитель</h1>
 	    </div>
 	    <div data-role="content" data-theme="b">
 	      <div id="divUser">
@@ -1624,7 +1708,7 @@
 		if (mode==0){
 		  $("#divUser").css("display","block");
 		  $("#divDirector").css("display","none");
-		  $("#twi_acc").html("МФЦ Заявитель");
+		  $("#twi_acc").html("Заявитель");
 		  if (propsApp["lastApp"]!='user')
 		    save=true;
 		  propsApp["lastApp"]='user';
@@ -1675,6 +1759,15 @@
 	    <div data-role="content" data-theme="b">
 		<h3 id="contacts_mfc_page_ownerName"></h3>
 		<div id="contacts_mfc_page_detail"></div>
+	    </div>
+	</div>	
+
+	<div data-role="page" id="contacts_mfc_map_page" data-add-back-btn="true" data-back-btn-text="Назад">
+	    <div data-role="header" data-theme="b" data-position="fixed">
+		    <a href="#main_page" data-role="button" data-icon="bars" data-inline="true" class="ui-btn-right">Меню</a>
+		    <h1>Контакты МФЦ</h1>
+	    </div>
+	    <div data-role="content" data-theme="b" id="map_canvas">
 	    </div>
 	</div>	
 	
@@ -1818,22 +1911,6 @@
 		<a onclick="callBack_send()" data-role="button">Отправить заявку</a>
 	    </div>
 	</div>
-	<div data-role="page" id="callBack_Disable" data-add-back-btn="true" data-back-btn-text="Назад">
-	    <div data-role="header" data-theme="b" data-position="fixed">
-		    <a href="#main_page" data-role="button" data-icon="bars" data-inline="true" class="ui-btn-right">Меню</a>
-		    <h1>Звонок</h1>
-	    </div>
-	    <div data-role="content" data-theme="b">
-		<h2>Данная опция вам недоступна!*<h2>
-		<p>Данная опция станет доступна Вам после того</p>
-		<p>как вы сделаете следующие действия</p>
-		<ol>
-		  <li>Зайдите в "Настройки"</li>
-		  <li>Введите свой номер телефона</li>
-		  <li>Нажмите кнопку "Сохранить"</li>
-		</ol>		
-	    </div>
-	</div>
 	
 	<div data-role="page" id="records_page_list" data-add-back-btn="false" data-back-btn-text="Назад">
 	    <div data-role="header" data-theme="b" data-position="fixed">
@@ -1934,8 +2011,8 @@
 	    <div data-role="content" data-theme="b">	
 		    <div data-role="navbar">
 			<ul>
-			    <li><a onclick="serviceInfo_changeList(true,'status1');" class="ui-btn-active">Оказанные услуги</a></li>
-			    <li><a onclick="serviceInfo_changeList(false,'status1');">Текущие услуг</a></li>
+			    <li><a id="serviceInfo_check1" onclick="serviceInfo_changeList(true,'status1');" class="ui-btn-active">Оказанные услуги</a></li>
+			    <li><a id="serviceInfo_check2" onclick="serviceInfo_changeList(false,'status1');">Текущие услуги</a></li>
 			</ul>
 		    </div>			
 		    <p id="status1"></p>
@@ -1964,6 +2041,8 @@
 	<div data-role="page" id="menu1_serviceInfo" data-add-back-btn="true" data-back-btn-text="Назад">
 		<div data-role="popup" id="menu_Panel_Context" data-theme="d">
 		    <ul data-role="listview" data-inset="true" data-divider-theme="d">
+		      <li><a onclick="serviceInfo_back()">Назад</a></li>
+		      <li data-role="list-divider"></li>
 		      <li><a onclick="serviceInfo_showInfo('first',false)">Общая информация</a></li>
 		      <li><a onclick="serviceInfo_showInfo('status',false)">Ход исполнения услуги</a></li>
 		      <li><a onclick="serviceInfo_showInfo('docs',false)">Документы</a></li>
