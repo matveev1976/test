@@ -566,7 +566,11 @@
 	    //Обработка ошибок запроса
 	    function formatErrorMessage(jqXHR, exception) {
 		//alert(jqXHR+","+jqXHR.status+","+jqXHR.responseText+","+exception);
-		if (exception == 'parsererror') {
+		if (exception == 'timeout')
+		    return ('Время запроса истекло. Проверьте адрес репозитария.');
+		else
+		    return ('При получении данных от сервера произошла ошибка.');
+/*		if (exception == 'parsererror') {
 		    return ('JSON разбор полученных данных не удался.');
 		} else if (exception == 'timeout') {
 		    return ('Время запроса истекло. Проверьте адрес репозитария.');
@@ -580,7 +584,7 @@
 		    return ('Внутрення ошибка сервера [500].');
 		}else{
 		    return ('Непредвиденная ошибка.\n' + jqXHR.responseText);
-		}
+		}*/
 	    }	    
 	    
 	    $.ajaxSetup( {
@@ -679,7 +683,7 @@
 			    function(response) {
 			      if (checkError(response)){			      
 				$.each( response.result, function ( i, val ) {
-					html += "<li url='"+val.url+"'>" + val.nameRegion + "</li>";
+					html += "<li url='"+val.url+"'><span class='word_wrap'>" + val.nameRegion + "</span></li>";
 				});
 				$ul.html( html );
 				$ul.listview( "refresh" );
@@ -717,7 +721,7 @@
 			    function(response) {
 			      if (checkError(response)){			      
 				$.each( response.result, function ( i, val ) {
-					html += "<li code='"+val.value+"'>" + val.name + "</li>";
+					html += "<li code='"+val.value+"'><span class='word_wrap'>" + val.name + "</span></li>";
 				});
 				$ul.html( html );
 				$ul.listview( "refresh" );
@@ -797,7 +801,7 @@
 		    $ul=$('#serviceListInfo_listCat');
 		    //
 		    $.each( response.result, function ( i, val ) {
-			    html += "<li><a code='"+val.value+"' onclick='serviceListInfo_selectCat(this)'>" + val.name + "</a></li>";
+			    html += "<li><a code='"+val.value+"' onclick='serviceListInfo_selectCat(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
 		    });
 		    //
 		    $.mobile.changePage('#serviceListInfo');
@@ -830,7 +834,7 @@
 		    $ul=$('#selectService');
 		    //
 		    $.each( response.result, function ( i, val ) {
-			    html += "<li><a code='"+val.code+"' onclick='serviceListInfo_selectService(this)'>" + val.name + "</a></li>";
+			    html += "<li><a code='"+val.code+"' onclick='serviceListInfo_selectService(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
 		    });
 		    $.mobile.changePage('#serviceListInfo1');
 		    //
@@ -1078,7 +1082,7 @@
 		    $ul=$('#records_owners');
 		    //
 		    $.each( response.listOwner, function ( i, val ) {
-			    html += "<li><a code='"+val.value+"' onclick='records_selectOwner(this)'>" + val.name + "</a></li>";
+			    html += "<li><a code='"+val.value+"' onclick='records_selectOwner(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
 		    });
 		    if (response.listOwner.length==0)
 		      html="<h3>Нет филиалов для предварительной записи</h3>";
@@ -1114,7 +1118,7 @@
 		    $ul=$('#records_services');
 		    //
 		    $.each( response.listService, function ( i, val ) {
-			    html += "<li><a code='"+val.id+"' onclick='records_selectService(this)'>" + val.name + "</a></li>";
+			    html += "<li><a code='"+val.id+"' onclick='records_selectService(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
 		    });
 		    $.mobile.changePage('#records_page_service');
 		    //
@@ -1417,7 +1421,7 @@
 		    $ul=$('#director_owners');
 		    //
 		    $.each( response.result, function ( i, val ) {
-			    html += "<li><a code='"+val.value+"' onclick='director_select_owner(this)'>" + val.name + "</a></li>";
+			    html += "<li><a code='"+val.value+"' onclick='director_select_owner(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
 		    });
 		    $.mobile.changePage('#director_select_owner');
 		    //
@@ -1637,6 +1641,7 @@ function createMarker(latlng, myTitle, myNum, myIcon) {
 
 	    .m-value2 {
 	      font-style: italic;	  
+	      white-space : normal;
 	    }
 	    
 	    .numberCircle {
@@ -1652,7 +1657,11 @@ function createMarker(latlng, myTitle, myNum, myIcon) {
 		height: 100%; 	
 		position:absolute;
 		top:0px;
-	    }	    
+	    }	   
+	    
+	    .word_wrap {
+		white-space : normal;
+	    }​	    
 	    
 	</style>
         
