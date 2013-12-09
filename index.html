@@ -102,8 +102,8 @@
         <script type="text/javascript">
 
 	    var ddd;
-	    var storeName='propsAppMFC31331';
-	    var propsAppEt = {'phone':'','email':'','password':'','urlrepo':'http://192.168.58.135','auto_selectMFC':'','director':false,'lastApp':'user'};
+	    var storeName='propsAppMFCN1';
+	    var propsAppEt = {'phone':'','email':'','password':'','urlrepo':'http://192.168.58.135','auto_selectMFC':'','director':false,'lastApp':'user','register':false};
 	    var propsApp;
 	    var userError;
 	    var modeServiceInfo;
@@ -188,20 +188,22 @@
 		if (typeApp=='mfc'){
 		  propsApp={'phone':'','email':'','password':'',
 		    'urlrepo':'http://mfc.samara.lanit.ru','auto_selectMFC':'','auto_selectMFC_key':'',
-		    'director':false,'lastApp':'user'};
+		    'director':false,'lastApp':'user','register':false};
 		}else if (typeApp=='tumen')
 		  propsApp={'phone':'','email':'','password':'',
 		    'urlrepo':'http://109.233.228.11','auto_selectMFC':'','auto_selectMFC_key':'',
-		    'director':false,'lastApp':'user'};
+		    'director':false,'lastApp':'user','register':false};
 		else
 		  propsApp={'phone':'','email':'','password':'',
 		    'urlrepo':'http://192.168.58.135','auto_selectMFC':'МЭР','auto_selectMFC_key':'http://192.168.58.135',
-		    'director':false,'lastApp':'user'};
+		    'director':false,'lastApp':'user','register':false};
 	      }
 	      if (propsApp["lastApp"]==undefined)
 		propsApp["lastApp"]="user";
 	      if (propsApp["director"]==undefined)
 		propsApp["director"]=false;
+	      if (propsApp["register"]==undefined)
+		propsApp["register"]=false;
 	      //
 	      $.each( propsAppEt, function ( i, val ) {
 		if (i.substr(0,5)=='auto_'){
@@ -628,6 +630,12 @@
 	    function checkError (response){
 	      ddd=response;
 	      $.mobile.loading('hide');
+	      if (response.register!=null){
+		if (response.register!=propsApp['register']){
+		  propsApp['register']=response.register;
+		  saveSattings();
+		}
+	      }
 	      if (response.error!=0){
 		showMessage(response.errorMsg);
 		return false;
@@ -660,6 +668,28 @@
 	      //$("#phone").mask("89999999999");
 	    });
 
+	    $( document ).on( "pagebeforeshow", "#main_page", function() {
+	      if (!propsApp['register']){
+		if (!$("#item_callBack").hasClass("ui-disabled")){
+		  $("#item_callBack").addClass("ui-disabled");
+		  $("#item_records").addClass("ui-disabled");
+		  $("#item_home").addClass("ui-disabled");
+		  $("#item_eq").addClass("ui-disabled");
+		  //
+		  $("#register_warn").css("display","block");
+		}  
+	      }else{
+		if ($("#item_callBack").hasClass("ui-disabled")){
+		  $("#item_callBack").removeClass("ui-disabled");
+		  $("#item_records").removeClass("ui-disabled");
+		  $("#item_home").removeClass("ui-disabled");
+		  $("#item_eq").removeClass("ui-disabled");
+		  //
+		  $("#register_warn").css("display","none");
+		}  
+	      }
+	    });
+	    
 	    $( document ).on( "pageinit", "#main_page", function() {
 		    $( "#selectMFC" ).on( "listviewbeforefilter", function ( e, data ) {
 			var $ul = $( this ),
@@ -1042,6 +1072,9 @@
 		    $.mobile.changePage('#records_page_list');
 		    $("#records_list").html(html);
 		    $("#records_list").trigger("create");
+		    //
+		    $('#clientName').val(response.firstName);
+		    $('#clientSurname').val(response.lastName);
 		  }
 		}
 	      });
@@ -1695,10 +1728,15 @@ function createMarker(latlng, myTitle, myNum, myIcon) {
 		    <li><a onclick="page_go('contacts')">Контакты МФЦ</a></li>
 		    <li id="item_callBack"><a onclick="callBack_go()">Обратный звонок</a></li>
 		    <li id="item_records"><a onclick="records_go(0)">Запись на прием</a></li>
-		    <li><a onclick="serviceInfo_go();" data-transition="none">Личный кабинет</a></li>
+		    <li id="item_home"><a onclick="serviceInfo_go();" data-transition="none">Личный кабинет</a></li>
 		    <li id="item_eq"><a onclick="page_go('eq')" data-transition="none">Состояние ЭО</a></li>
 		    <li><a href="#settings">Настройка</a></li>
 		</ul>
+		<div id="register_warn" class="ui-bar ui-bar-e" style="display:none">
+		  <h3 style="display:inline-block; width:92%; margin-top:5px;">Необходима регистрация.</h3>
+		  <div style="display:inline-block; width:8%; margin-top:0px; text-align:right;"></div>
+		  <p style="font-size:85%; margin:-.3em 0 1em;">Для доступа ко всем функциям.</p>
+		</div>		
 	      </div>
 	      <div id="divDirector" style="display:none">
 		<ul data-role="listview" data-inset="true" data-divider-theme="d">
@@ -1708,9 +1746,7 @@ function createMarker(latlng, myTitle, myNum, myIcon) {
 		    <li><a href="#settings">Настройка</a></li>
 		</ul>
 	      </div>
-	      
 	    </div>
-	    
 	    <script>
 	      function checkMode(mode){
 		var save=false;
