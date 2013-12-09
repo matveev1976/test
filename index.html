@@ -183,9 +183,6 @@
 	      //alert(JSON.stringify(propsApp));
 	      //
 	      localStorage.setItem(storeName, JSON.stringify(propsApp));
-	      //
-	      propsApp["register"]=!emptyValue(propsApp["phone"])&&!emptyValue(propsApp["password"])
-		&&!emptyValue(propsApp["auto_selectMFC"])&&!emptyValue(propsApp["auto_selectMFC_key"]);
 	    }
 	    
 	    function loadSettings(){
@@ -210,9 +207,8 @@
 		propsApp["lastApp"]="user";
 	      if (propsApp["director"]==undefined)
 		propsApp["director"]=false;
-	      //
-	      propsApp["register"]=!emptyValue(propsApp["phone"])&&!emptyValue(propsApp["password"])
-		&&!emptyValue(propsApp["auto_selectMFC"])&&!emptyValue(propsApp["auto_selectMFC_key"]);
+	      if (propsApp["register"]==undefined)
+		propsApp["register"]=false;
 	      //
 	      $.each( propsAppEt, function ( i, val ) {
 		if (i.substr(0,5)=='auto_'){
@@ -639,6 +635,12 @@
 	    function checkError (response){
 	      ddd=response;
 	      $.mobile.loading('hide');
+	      if (response.register!=null){
+		if (response.register!=propsApp['register']){
+		  propsApp['register']=response.register;
+		  saveSattings();
+		}
+	      }
 	      if (response.error!=0){
 		showMessage(response.errorMsg);
 		return false;
@@ -677,7 +679,6 @@
 		  $("#item_callBack").addClass("ui-disabled");
 		  $("#item_records").addClass("ui-disabled");
 		  $("#item_home").addClass("ui-disabled");
-		  $("#item_eq").addClass("ui-disabled");
 		  //
 		  $("#register_warn").css("display","block");
 		}  
@@ -686,7 +687,6 @@
 		  $("#item_callBack").removeClass("ui-disabled");
 		  $("#item_records").removeClass("ui-disabled");
 		  $("#item_home").removeClass("ui-disabled");
-		  $("#item_eq").removeClass("ui-disabled");
 		  //
 		  $("#register_warn").css("display","none");
 		}  
