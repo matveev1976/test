@@ -116,6 +116,7 @@
 	    var okgu_answer={};
 	    //mfc, tumen, test
 	    var typeApp='mfc';
+	    var deviceready=false;
 
 	    //alert("cordova" in window);
 	    if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
@@ -144,6 +145,10 @@
 		$("#item_director_search").css("display","none");
 		$("#urlrepo_div").css("display","none");
 	      }
+	      //
+	      disableMenuItem();
+	      //
+	      deviceready=true;
 	    }
 	    
 	    function emptyValue(val){
@@ -178,6 +183,9 @@
 	      //alert(JSON.stringify(propsApp));
 	      //
 	      localStorage.setItem(storeName, JSON.stringify(propsApp));
+	      //
+	      propsApp["register"]=!emptyValue(propsApp["phone"])&&!emptyValue(propsApp["password"])
+		&&!emptyValue(propsApp["auto_selectMFC"])&&!emptyValue(propsApp["auto_selectMFC_key"]);
 	    }
 	    
 	    function loadSettings(){
@@ -202,8 +210,9 @@
 		propsApp["lastApp"]="user";
 	      if (propsApp["director"]==undefined)
 		propsApp["director"]=false;
-	      if (propsApp["register"]==undefined)
-		propsApp["register"]=false;
+	      //
+	      propsApp["register"]=!emptyValue(propsApp["phone"])&&!emptyValue(propsApp["password"])
+		&&!emptyValue(propsApp["auto_selectMFC"])&&!emptyValue(propsApp["auto_selectMFC_key"]);
 	      //
 	      $.each( propsAppEt, function ( i, val ) {
 		if (i.substr(0,5)=='auto_'){
@@ -630,12 +639,6 @@
 	    function checkError (response){
 	      ddd=response;
 	      $.mobile.loading('hide');
-	      if (response.register!=null){
-		if (response.register!=propsApp['register']){
-		  propsApp['register']=response.register;
-		  saveSattings();
-		}
-	      }
 	      if (response.error!=0){
 		showMessage(response.errorMsg);
 		return false;
@@ -668,8 +671,8 @@
 	      //$("#phone").mask("89999999999");
 	    });
 
-	    $( document ).on( "pagebeforeshow", "#main_page", function() {
-/*	      if (!propsApp['register']){
+	    function disableMenuItem(){
+	      if (!propsApp['register']){
 		if (!$("#item_callBack").hasClass("ui-disabled")){
 		  $("#item_callBack").addClass("ui-disabled");
 		  $("#item_records").addClass("ui-disabled");
@@ -687,7 +690,12 @@
 		  //
 		  $("#register_warn").css("display","none");
 		}  
-	      }*/
+	      }
+	    }
+	    
+	    $( document ).on( "pagebeforeshow", "#main_page", function() {
+	      if (deviceready)
+		disableMenuItem();
 	    });
 	    
 	    $( document ).on( "pageinit", "#main_page", function() {
