@@ -102,7 +102,7 @@
         <script type="text/javascript">
 
 	    var ddd;
-	    var storeName='propsAppMFCN1';
+	    var storeName='propsAppMFCN11';
 	    var propsAppEt = {'phone':'','email':'','password':'','urlrepo':'http://192.168.58.135','auto_selectMFC':'','director':false,'lastApp':'user','register':false};
 	    var propsApp;
 	    var userError;
@@ -114,8 +114,8 @@
 	    var okgu;
 	    var okgu_current;
 	    var okgu_answer={};
-	    //mfc, tumen, test
-	    var typeApp='mfc';
+	    //mfc, tumen, test, salehard
+	    var typeApp='salehard';
 	    var deviceready=false;
 
 	    //alert("cordova" in window);
@@ -144,6 +144,9 @@
 		$("#item_eq").css("display","none");
 		$("#item_director_search").css("display","none");
 		$("#urlrepo_div").css("display","none");
+	      }else if (typeApp=='salehard'){
+		$("#urlrepo_div").css("display","none");
+		$('#main_check_app').css('display','none');
 	      }
 	      //
 	      disableMenuItem();
@@ -190,14 +193,18 @@
 	      if (tmp!=null)
 		propsApp=JSON.parse(tmp);
 	      else{
-		if (typeApp=='mfc'){
+		if (typeApp=='mfc')
 		  propsApp={'phone':'','email':'','password':'',
 		    'urlrepo':'http://mfc.samara.lanit.ru','auto_selectMFC':'','auto_selectMFC_key':'',
 		    'director':false,'lastApp':'user','register':false};
-		}else if (typeApp=='tumen')
+		else if (typeApp=='tumen')
 		  propsApp={'phone':'','email':'','password':'',
 		    'urlrepo':'http://109.233.228.11','auto_selectMFC':'','auto_selectMFC_key':'',
 		    'director':false,'lastApp':'user','register':false};
+		else if (typeApp=='salehard')
+		  propsApp={'phone':'','email':'','password':'',
+		    'urlrepo':'http://91.242.171.89','auto_selectMFC':'','auto_selectMFC_key':'',
+		    'director':true,'lastApp':'director','register':false};
 		else
 		  propsApp={'phone':'','email':'','password':'',
 		    'urlrepo':'http://192.168.58.135','auto_selectMFC':'МЭР','auto_selectMFC_key':'http://192.168.58.135',
@@ -650,10 +657,12 @@
 		  propsApp['director']=response.director;
 		  saveSattings();
 		}
-		if (response.director)
-		  $('#main_check_app').css('display','block');
-		else  
-		  $('#main_check_app').css('display','none');
+		if (typeApp!='salehard'){
+		  if (response.director)
+		    $('#main_check_app').css('display','block');
+		  else  
+		    $('#main_check_app').css('display','none');
+		}    
 	      }
 	      if (!emptyValue(response.infoMsg))
 		showMessage(response.infoMsg);
