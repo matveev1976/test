@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
@@ -907,73 +907,46 @@
 	    
 	    var categoryService;
 	    var ownerService;
-	    var lsService;
-	    var catLS;
 	    
 	    function serviceListInfo_go(owner){
 	      ownerService=owner;
 	      $.ajax({
-	      url : getUrlMfc()+"/rest/mobileServices/listCategoryAndLS",
+	      url : getUrlMfc()+"/rest/mobileServices/listCategory",
 	      type : "GET",
 	      contentType : "application/json",
 	      dataType: "jsonp",
 	      success :
 		function(response) {
 		  if (checkError(response)){
-		    catLS=response;
-		    //result[0] - категории
-		    //result[1] - жс
-		    if (response.result[0].length>0 && response.result[1].length>0)
-		      $.mobile.changePage('#serviceListInfoCatLS');
-		    else if (response.result[0].length>0)
-		      serviceListInfo_go_createList(0);
-		    else  
-      		      serviceListInfo_go_createList(1);
-		  }
+		    var html="";
+		    $ul=$('#serviceListInfo_listCat');
+		    //
+		    $.each( response.result, function ( i, val ) {
+			    html += "<li><a code='"+val.value+"' onclick='serviceListInfo_selectCat(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
+		    });
+		    //
+		    $.mobile.changePage('#serviceListInfo');
+		    //	
+		    $ul.html( html );
+		    $ul.listview( "refresh" );
+		  }  
 		}
 	      });
 	    }
-
-	    function serviceListInfo_go_createList(mode){
-	      var html="";
-	      $ul=$('#serviceListInfo_listCat');
-	      if (mode==0){
-		$.each( catLS.result[0], function ( i, val ) {
-			html += "<li><a code='"+val.value+"' onclick='serviceListInfo_selectCatLS(this,0)'><span class='word_wrap'>" + val.name + "</span></a></li>";
-		});
-		$('#serviceListInfo_CatLS_title').html('Выберите категорию услуги');
-	      }else{
-		$.each( catLS.result[1], function ( i, val ) {
-			html += "<li><a code='"+val.value+"' onclick='serviceListInfo_selectCatLS(this,1)'><span class='word_wrap'>" + val.name + "</span></a></li>";
-		});
-		$('#serviceListInfo_CatLS_title').html('Выберите жизненную ситуацию');
-	      }
-	      $.mobile.changePage('#serviceListInfo');
-	      //	
-	      $ul.html( html );
-	      $ul.listview( "refresh" );
-	    }
 	    
-	    //0 - катагории, 1 - ls
-	    function serviceListInfo_selectCatLS(el, mode){
+	    function serviceListInfo_selectCat(el){
 	      pageModeService="serviceListInfo";
 	      var el = $(el);
-	      if (mode==0){
-		categoryService=el.attr('code');
-		lsService=null;
-	      }else{
-		categoryService=null;
-		lsService=el.attr('code');
-	      }
+	      categoryService=el.attr('code');
 	      $('#selectServicePage_cat').html(el.text());
 	      searchService('');
 	    }
-	    
+
 	    function searchService(val){
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/listServices",
 	      type : "GET",
-	      data : {search:val,category:categoryService,owner:ownerService,ls:lsService},
+	      data : {search:val,category:categoryService,owner:ownerService},
 	      contentType : "application/json",
 	      dataType: "jsonp",
 	      success :
@@ -1193,7 +1166,7 @@
 			      "<div class=ui-block-a>Номер: "+bb.bookingNumber+"</div>"+
 			      "<div class=ui-block-a>Код авторизации: "+bb.authCode+"</div>"+
 			    "</div>"+
-			    "<a owner='"+val.owner+"' authCode='"+bb.authCode+"' number='"+bb.bookingNumber+"' onclick='dialog_records_cancel(this)' data-rel='popup' data-position-to='window' data-transition='pop'>Отменить</a>"+			    
+			    "<a owner='"+val.owner+"' authCode='"+bb.authCode+"' number='"+bb.bookingNumber+"' onclick='dialog_records_cancel(this)' data-rel='popup' data-position-to='window' data-transition='pop'>Отменить</a>"+
 			  "</li>"+
 		      "</ul>";
 		    });
@@ -1212,6 +1185,7 @@
 	      recordsAuthCode=$(val).attr('authCode');
 	      recordsNumber=$(val).attr('number');
 	      owner=$(val).attr('owner');
+	      alert(owner);
 	      $("#dialog_records_cancel").popup("open");
 	    }
 	    
@@ -1265,8 +1239,6 @@
 	      records_searchService();
 	    }
 
-	    var recordsListService;
-	    
 	    function records_searchService(){
 	      $.ajax({
 	      url : getUrlMfc()+"/rest/mobileServices/leafService",
@@ -1280,45 +1252,17 @@
 		    var html="";
 		    $ul=$('#records_services');
 		    //
-		    recordsListService=response.listService;
-		    records_createListService(recordsListService);
+		    $.each( response.listService, function ( i, val ) {
+			    html += "<li><a code='"+val.id+"' onclick='records_selectService(this)'><span class='word_wrap'>" + val.name + "</span></a></li>";
+		    });
+		    $.mobile.changePage('#records_page_service');
+		    //
+		    $ul.html( html );
+		    $ul.listview( "refresh" );
+		    //$ul.trigger( "updatelayout");
 		  }  
 		}
 	      });
-	    }
-	    
-	    function records_createListService(listService){
-	      var html="";
-	      $ul=$('#records_services');
-	      //
-	      $.each( listService, function ( i, val ) {
-		var st=val.name;
-		var action="records_selectService(this)";
-		if (val.group){
-		  st+= "  /"+val.childs.length+"/";
-		  action="records_selectGroup("+val.id+")";
-		}
-		html += "<li><a code='"+val.id+"' onclick='"+action+"'><span class='word_wrap'>" + st + "</span></a></li>";
-	      });
-	      $.mobile.changePage('#records_page_service');
-	      //
-	      $ul.html( html );
-	      $ul.listview( "refresh" );
-	    }
-	    
-	    function searchElement(list, id){
-	      for (var i =0; i < list.length; i++){
-		if (list[i].id==id)
-		  return list[i];
-		var res=searchElement(list[i].childs, id);
-		if (res!=null)
-		  return res;
-	      }
-	    }
-	    
-	    function records_selectGroup(id){
-	      var g=searchElement(recordsListService,id);
-	      records_createListService(g.childs);
 	    }
 	    
 	    function records_selectService(el){
@@ -2281,27 +2225,14 @@
 	    </div>
 	</div>	
 	<!-- Director end-->
-
-	<div data-role="page" id="serviceListInfoCatLS" data-add-back-btn="true" data-back-btn-text="Назад">
-	    <div data-role="header" data-theme="b" data-position="fixed">
-		    <a href="#main_page" data-role="button" data-icon="bars" data-inline="true" class="ui-btn-right">Меню</a>
-		    <h1>Информация</h1>
-	    </div>
-	    <div data-role="content" data-theme="b">
-		<h3>Выберите критерий поиска</h3>
-		<ul data-role="listview" data-inset="true" data-theme="c">
-		  <li><a onclick="serviceListInfo_go_createList(0);">По категории</a></li>
-		  <li><a onclick="serviceListInfo_go_createList(1);">По жизненной ситуации</a></li>		
-		</ul>	    
-	    </div>
-	</div>	
+	
 	<div data-role="page" id="serviceListInfo" data-add-back-btn="true" data-back-btn-text="Назад">
 	    <div data-role="header" data-theme="b" data-position="fixed">
 		    <a href="#main_page" data-role="button" data-icon="bars" data-inline="true" class="ui-btn-right">Меню</a>
 		    <h1>Информация</h1>
 	    </div>
 	    <div data-role="content" data-theme="b">
-		<h3 id="serviceListInfo_CatLS_title">Выберите категорию услуги</h3>
+		<h3>Выберите категорию услуги</h3>
 		<ul id="serviceListInfo_listCat" data-role="listview" data-inset="true" data-theme="c">
 		</ul>	    
 	    </div>
