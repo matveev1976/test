@@ -1292,13 +1292,15 @@
 	      $ul=$('#records_services');
 	      //
 	      $.each( listService, function ( i, val ) {
-		var st=val.name;
+		var st="";
+		var theme="";
 		var action="records_selectService(this)";
 		if (val.group){
-		  st+= "  /"+val.childs.length+"/";
+		  st= "<span class='ui-li-count'>"+val.childs.length+"</span>";
+		  theme="data-theme='e'";
 		  action="records_selectGroup("+val.id+")";
 		}
-		html += "<li><a code='"+val.id+"' onclick='"+action+"'><span class='word_wrap'>" + st + "</span></a></li>";
+		html += "<li "+theme+"><a code='"+val.id+"' onclick='"+action+"'><span class='word_wrap'>" + val.name + "</span>"+st+"</a></li>";
 	      });
 	      $.mobile.changePage('#records_page_service');
 	      //
@@ -2404,7 +2406,7 @@
 	    <div data-role="content" data-theme="b">	
 	      <h3>Выберите услугу<h3>
 <!--	      <input type="search" onkeyup="records_searchService($(this).val())" value="" placeholder="Поиск услуги..."> -->
-	      <ul id="records_services" data-role="listview" data-inset="true" data-theme="c">
+	      <ul id="records_services" data-role="listview" data-inset="true" data-theme="c" data-divider-theme="e" data-count-theme="b">
 	      </ul>	    
 	    </div>
 	</div>	
