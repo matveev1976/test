@@ -350,11 +350,17 @@
 		    //
 		    var html="";
 		    $.each( response.result, function ( i, val ) {
+		      var st="";
+		      if (val.groupDoc!=null)
+			st="<div class=ui-block-a>Номер группового комплекта:</div>"+
+			"<div class=ui-block-a><span class='m-value2-red'>"+val.groupDoc+"</span></div>"+
+			"<div class=ui-block-a>Жизненная ситуация:</div>"+
+			"<div class=ui-block-a><span class='m-value2-red'>"+val.ls+"</span></div>";
 		      html+=
 		      "<ul data-role='listview' data-ajax='false' data-inset='true' data-theme='d'>"+
 			  "<li data-role='list-divider'>"+val.serviceName+"</li>"+
 			  "<li><a onclick='serviceInfo_selectService(this,false)' authCode='"+val.authCode+"' packNum='"+val.packNum+"'>"+
-			    "<div class=ui-grid-a>"+
+			    "<div class=ui-grid-a>"+st+
 			      "<div class=ui-block-a>Номер комплекта документов:</div>"+
 			      "<div class=ui-block-a><span class='m-value2'>"+val.packNum+"</span></div>"+
 			      "<div class=ui-block-a>Дата обращения:</div>"+
@@ -410,6 +416,10 @@
 		    $(id).html(val.packInfo.serviceName);
 		    //Общая информация
 		    html="<table>";
+		    if (val.packInfo.groupDoc!=null){
+		      html+="<tr><td><span class='m-label2'>Номер группового комплекта</span></td></tr><tr><td><span class='m-value-red'>"+val.packInfo.groupDoc+"</span></td></tr>";
+		      html+="<tr><td><span class='m-label2'>Жизненная ситуация</span></td></tr><tr><td><span class='m-value-red'>"+val.packInfo.ls+"</span></td></tr>";
+		    }
 		    html+="<tr><td><span class='m-label2'>Номер комплекта документов</span></td></tr><tr><td><span class='m-value'>"+val.packInfo.packNum+"</span></td></tr>";
 		    html+="<tr><td><span class='m-label2'>Цель</span></td></tr><tr><td><span class='m-value'>"+val.goal+"</span></td></tr>";
 		    html+="<tr><td><span class='m-label2'>Жизненные ситуации</span></td></tr>";
@@ -1995,9 +2005,19 @@
 	    .m-value {
 	    }
 
+	    .m-value-red {
+	      color : red
+	    }
+	    
 	    .m-value2 {
 	      font-style: italic;	  
 	      white-space : normal;
+	    }
+
+	    .m-value2-red {
+	      font-style: italic;	  
+	      white-space : normal;
+	      color : red
 	    }
 	    
 	    .numberCircle {
