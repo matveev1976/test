@@ -688,8 +688,8 @@
 		function (xhr,status){
 		  if (status=='success'){
 		    //$.mobile.loading('hide');
-		    //showMessage(response.errorMsg);		    
-		  }  
+		    //showMessage(response.errorMsg);
+		  } 
 		}
 	    });
 	    
@@ -720,6 +720,14 @@
 	      }
 	      if (!emptyValue(response.infoMsg))
 		showMessage(response.infoMsg);
+	      //
+	      if (response.email!=null&&response.email!=undefined&&response.email!=''){
+		if (response.email!=$('#email').val()){
+		  $('#email').val(response.email);
+		  propsApp["email"]=response.email;
+		  saveSattings();
+		}  
+	      }
 	      return true;
 	    }
     
