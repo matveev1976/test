@@ -892,14 +892,13 @@
 	      saveSattings();
 	      //
 	      $.ajax({
-	      url : "https://www.googleapis.com/language/translate/v2?parameter",
+	      url : getUrlMfc()+"/rest/mobileServices/checkRegister",
 	      type : "GET",
 	      data : {phone:propsApp['phone'], pwd:propsApp['password']},
 	      contentType : "application/json",
 	      dataType: "jsonp",
 	      success :
 		function(response) {
-		  alert(response.error.message);
 		  if (checkError(response))
 		    showMessage("Реквизиты настроены верно");
 		}
